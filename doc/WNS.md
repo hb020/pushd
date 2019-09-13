@@ -12,7 +12,7 @@ Windows Phone application, you have to link your (already registered under same 
 
 ### Sample Configuration
 
-``` coffeescript
+``` javascript
 exports["wns-toast"] =
     enabled: yes
     client_id: 'ms-app://SID-from-developer-console'

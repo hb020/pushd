@@ -4,11 +4,11 @@ Performance testing for pushd
 Simple performance testing setup using HTTP push service:
 
 1. Configuration:
-  - Enable http push server in settings.coffee
+  - Enable http push server in settings.js
   - Configure the number and frequency of generated messages by editing settings() method pushgenerator.py
-1. Start the pushd server: `node server.js`
-1. Start test performance listener: `node statsserver.js`
-1. Start traffic generator: `python pushgenerator.py`
+2. Start the pushd server: `node server.js`
+3. Start test performance listener: `node statsserver.js`
+4. Start traffic generator: `python pushgenerator.py`
 
 Traffic generator
 -----------------
@@ -23,7 +23,7 @@ pushd process is expected be running on localhost on port 5000
 
 By default, pushgenerator.py creates random HTTP POST subscribers as
 the receivers of the notifications. The HTTP push service must be
-enabled in pushd's settings.coffee.
+enabled in pushd's settings.js.
 
 Statistics collector
 --------------------

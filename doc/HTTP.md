@@ -27,7 +27,7 @@ An arbitrary HTTP or HTTPS URL accepting POSTs with JSON data.
 
 ### Sample Configuration
 
-``` coffeescript
+``` javascript
 exports['http'] =
     enabled: yes
     class: require('./lib/pushservices/http').PushServiceHTTP

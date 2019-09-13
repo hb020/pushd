@@ -4,7 +4,7 @@ A base64 string
 
 ### Sample Configuration
 
-``` coffeescript
+``` javascript
 exports['gcm'] =
     enabled: yes
     class: require('./lib/pushservices/gcm').PushServiceGCM

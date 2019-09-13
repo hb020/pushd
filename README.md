@@ -34,12 +34,12 @@ Features
 Installation
 ------------
 
-- Install [redis](http://redis.io/), [node.js](http://nodejs.org/), [npm](http://npmjs.org/) and [coffeescript](http://coffeescript.org/).
+- Install [redis](http://redis.io/), [node.js](http://nodejs.org/), [npm](http://npmjs.org/).
 - Clone the repository: `git clone git://github.com/rs/pushd.git && cd pushd`
 - Install dependancies: `npm install`
-- Configure the server: `cp settings-sample.coffee settings.coffee && vi settings.coffee`
+- Configure the server: `cp settings-sample.js settings.js && vi settings.js`
 - Start redis: `redis-server`
-- Start the server: `sudo coffee pushd.coffee`
+- Start the server: `sudo pushd.js`
 
 Glossary
 --------
@@ -531,7 +531,7 @@ Ensures that the service is running and connected to Redis.
 Logging
 -------
 
-The verbosity of logging can be configured with the `loglevel` property in settings.coffee.
+The verbosity of logging can be configured with the `loglevel` property in settings.js.
 
     exports['loglevel'] = 'verbose'
 

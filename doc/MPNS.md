@@ -4,7 +4,7 @@ URL starting with something like `http://db3.notify.live.net/throttledthirdparty
 
 ### Sample Configuration
 
-``` coffeescript
+``` javascript
 exports['mpns-toast'] =
     enabled: yes
     class: require('./lib/pushservices/mpns').PushServiceMPNS
