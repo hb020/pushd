@@ -12,6 +12,7 @@ const { Event } = require('./lib/event');
 const { PushServices } = require('./lib/pushservices');
 const { Payload } = require('./lib/payload');
 const logger = require('winston');
+const morgan = require('morgan');
 
 if (settings.server.redis_socket != null) {
     redis = require('redis').createClient(settings.server.redis_socket);
@@ -83,13 +84,12 @@ const checkUserAndPassword = (username, password) => {
 
 const app = express();
 
-if (settings.server != null ? settings.server.access_log : undefined) { app.use(express.logger(':method :url :status')); }
+if (settings.server != null ? settings.server.access_log : undefined) { app.use(morgan(':method' + ' :url :status')); }
 if (((settings.server != null ? settings.server.auth : undefined) != null) && ((settings.server != null ? settings.server.acl : undefined) == null)) {
     app.use(express.basicAuth(checkUserAndPassword));
 }
 app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 app.use(bodyParser.json({ limit: '1mb' }));
-app.use(app.router);
 app.disable('x-powered-by');
 
 app.param('subscriber_id', function(req, res, next, id) {
@@ -98,7 +98,7 @@ app.param('subscriber_id', function(req, res, next, id) {
         delete req.params.subscriber_id;
         return next();
     } catch (error) {
-        return res.json({error: error.message}, 400);
+        return res.status(400).json({error: error.message});
     }
 });
 
@@ -114,7 +114,7 @@ app.param('event_id', function(req, res, next, id) {
         delete req.params.event_id;
         return next();
     } catch (error) {
-        return res.json({error: error.message}, 400);
+        return res.status(400).json({error: error.message});
     }
 });
 
@@ -126,14 +126,14 @@ const authorize = function(realm) {
             logger.verbose(`Authenticating ${req.user} for ${realm}`);
             if ((req.user == null)) {
                 logger.error("User not authenticated");
-                res.json({error: 'Unauthorized'}, 403);
+                res.status(403).json({error: 'Unauthorized'});
                 return;
             }
 
             const allowedRealms = (settings.server.auth[req.user] != null ? settings.server.auth[req.user].realms : undefined) || [];
             if (!Array.from(allowedRealms).includes(realm)) {
                 logger.error(`No access to ${realm} for ${req.user}, allowed: ${allowedRealms}`);
-                res.json({error: 'Unauthorized'}, 403);
+                res.status(403).json({error: 'Unauthorized'});
                 return;
             }
 
@@ -155,7 +155,7 @@ const authorize = function(realm) {
                     }
                 }
             }
-            return res.json({error: 'Unauthorized'}, 403);
+            return res.status(403).json({error: 'Unauthorized'});
         };
     } else {
         return (req, res, next) => next();
