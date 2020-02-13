@@ -1,5 +1,6 @@
 let redis;
 const express = require('express');
+const basicAuth = require('basic-auth-connect');
 const bodyParser = require('body-parser');
 const dgram = require('dgram');
 const zlib = require('zlib');
@@ -86,7 +87,7 @@ const app = express();
 
 if (settings.server != null ? settings.server.access_log : undefined) { app.use(morgan(':method' + ' :url :status')); }
 if (((settings.server != null ? settings.server.auth : undefined) != null) && ((settings.server != null ? settings.server.acl : undefined) == null)) {
-    app.use(express.basicAuth(checkUserAndPassword));
+    app.use(basicAuth(checkUserAndPassword));
 }
 app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 app.use(bodyParser.json({ limit: '1mb' }));
