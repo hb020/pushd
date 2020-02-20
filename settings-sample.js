@@ -23,10 +23,7 @@ exports.server = {
 //            password: 'password'
 //            realms: ['register', 'publish']
 
-exports['event-source'] =
-    {enabled: true};
-
-exports['apns'] = {
+exports.apns = {
     enabled: true,
     class: require('./lib/pushservices/apns').PushServiceAPNS,
     // Convert cert.cer and key.p12 using:
@@ -38,7 +35,6 @@ exports['apns'] = {
     // Uncomment to set the default value for parameter.
     // This setting not overrides the value for the parameter that is set in the payload fot event request.
     // category: 'show'
-    // contentAvailable: true
     // Selects data keys which are allowed to be sent with the notification
     // Keep in mind that APNS limits notification payload size to 256 bytes
     payloadFilter: ['messageFrom']
@@ -59,77 +55,14 @@ exports['apns'] = {
 //	  # Uncomment to set the default value for parameter.
 //     # This setting not overrides the value for the parameter that is set in the payload fot event request.
 //     # category: 'show'
-//     # contentAvailable: true
 
-exports["wns-toast"] = {
-    enabled: true,
-    client_id: 'ms-app://SID-from-developer-console',
-    client_secret: 'client-secret-from-developer-console',
-    class: require('./lib/pushservices/wns').PushServiceWNS,
-    type: 'toast',
-    // Any parameters used here must be present in each push event.
-    launchTemplate: '/Page.xaml?foo=${data.foo}'
-};
-
-exports['gcm'] = {
+exports.gcm = {
     enabled: true,
     class: require('./lib/pushservices/gcm').PushServiceGCM,
     key: 'GCM API KEY HERE'
 };
     //options:
        //proxy: 'PROXY SERVER HERE'
-
-// # Legacy Android Push Service
-// exports['c2dm'] =
-//     enabled: yes
-//     class: require('./lib/pushservices/c2dm').PushServiceC2DM
-//     # App credentials
-//     user: 'app-owner@gmail.com'
-//     password: 'something complicated and secret'
-//     source: 'com.yourcompany.app-name'
-//     # How many concurrent requests to perform
-//     concurrency: 10
-
-exports['http'] = {
-    enabled: true,
-    class: require('./lib/pushservices/http').PushServiceHTTP
-};
-
-exports['mpns-toast'] = {
-    enabled: true,
-    class: require('./lib/pushservices/mpns').PushServiceMPNS,
-    type: 'toast',
-    // Used for WP7.5+ to handle deep linking
-    paramTemplate: '/Page.xaml?object=${data.object_id}'
-};
-
-exports['mpns-tile'] = {
-    enabled: true,
-    class: require('./lib/pushservices/mpns').PushServiceMPNS,
-    type: 'tile',
-    // Mapping defines where - in the payload - to get the value of each required properties
-    tileMapping: {
-        // Used for WP7.5+ to push to secondary tiles
-        // id: "/SecondaryTile.xaml?DefaultTitle=${event.name}"
-        // count: "${data.count}"
-        title: "${data.title}",
-        backgroundImage: "${data.background_image_url}",
-        backBackgroundImage: "#005e8a",
-        backTitle: "${data.back_title}",
-        backContent: "${data.message}",
-        // param for WP8 flip tile (sent when subscriber declare a minimum OS version of 8.0)
-        smallBackgroundImage: "${data.small_background_image_url}",
-        wideBackgroundImage: "${data.wide_background_image_url}",
-        wideBackContent: "${data.message}",
-        wideBackBackgroundImage: "#005e8a"
-    }
-};
-
-exports['mpns-raw'] = {
-    enabled: true,
-    class: require('./lib/pushservices/mpns').PushServiceMPNS,
-    type: 'raw'
-};
 
 // Transports: Console, File, Http
 //
@@ -143,7 +76,7 @@ exports['mpns-raw'] = {
 //
 // See https://github.com/flatiron/winston#working-with-transports for
 // other transport-specific options.
-exports['logging'] = [{
+exports.logging = [{
         transport: 'Console',
         options: {
             level: 'info'

@@ -8,7 +8,7 @@ Universal Mobile Push Daemon
 Features
 --------
 
-- Multi protocols [APNs] \(iOS), C2DM/[GCM] \(Android), [MPNS] \(Windows Phone), [HTTP] POST, [EventSource](#event-source), [WNS] \(Windows Notification Service)
+- Supports [APNs] \(iOS) and FCM/[GCM] \(Android)
 - Pluggable protocols
 - Register unlimited number of subscribers (device)
 - Subscribe to unlimited number of events
@@ -27,9 +27,6 @@ Features
 
 [APNs]: doc/APNs.md
 [GCM]: doc/GCM.md
-[MPNS]: doc/MPNS.md
-[HTTP]: doc/HTTP.md
-[WNS]: doc/WNS.md
 
 Installation
 ------------
@@ -47,7 +44,9 @@ Glossary
 - `Application Data Provider`: The service emitting `Events` (i.e: other users actions) to be notified to `Subscribers` (i.e.: mobiles app)
 - `Subscribers`: Entities wanting to be notified about certain type of `Events`. There's two kind of subscribers: offline subscribers and online subscribers. The current implementation of pushd does only support offline subscribers. Difference between online and offline subscribers is that online subscribers are required to stay connected to maintain subscriptions while offline subscribers are persisted in pushd database, and only have to instruct pushd when they change their status (subscriptions etc.).
 - `Event`: A string with associated metadata representing an action performed on the `Application Data Provider`. Events are emitted by the `Application Data Provider` (i.e.: a web site or your application's server-side backend), and `Subscribers` can subscribe to them in order to be notified by the `Protocol` of their choice.
-- `Protocol`: A communication standard to send notification back to the `Subscriber`. Protocols are pluggable in pushd so you can add your own custom protocol. By default, pushd is bundled with support for APNs (iOS), C2DM/GCM (Android) and MPNS (Windows Phone). More protocols will be added in the future.
+- `Protocol`: A communication standard to send notification back to the `Subscriber`. Protocols
+ are pluggable in pushd so you can add your own custom protocol. By default, pushd is bundled
+  with support for APNs (iOS) and FCM/GCM (Android).
 
 Getting Started
 ---------------
@@ -63,7 +62,6 @@ Subscriber registration is performed through a HTTP REST API (see later for more
            -d lang=fr \
            -d badge=0 \
            -d category=show \
-           -d contentAvailable=true \
            http://localhost/subscribers
 
 In reply, we get the following JSON structure:
@@ -109,7 +107,7 @@ We recommend to auto-subscribe your users to some global event like for instance
 ### Typical App Launch Tasks
 
 1. Obtain device token from the OS
-2. Post the token on `/subscriber/:token` with parameters like `lang`, `badge` and `version`
+2. Post the token on `/subscriber/:token` with parameters like `lang` and `badge`
 3. Extract the `id` from the response (you don't need to store it, treat it like a session id)
 4. Resubscribe the device to all its previously subscribed events by posting on `/subscriber/:id/subscriptions`
 
@@ -125,49 +123,6 @@ Here we will send a message to all subscribers subscribed to the `sport` event:
 
     $ curl -d msg=Test%20message http://localhost/event/sport
 
-Event Source
-------------
-
-Pushd supports the [Event Source](http://www.w3.org/TR/eventsource/) protocol, also known as Server Sent Events. This allows your web application to benefits from the same pushed event than your native apps.
-
-This protocol is very different from other pushd supported protocol because it doesn't involve subscriber registration nor stored subscriptions. The web service connects to the pushd server and declars which event it is interested in, and then pushd will push subscribed events in this same connections until the client stays connected.
-
-You may want to use [Yaffle EventSource polyfill](https://github.com/Yaffle/EventSource) on the client side in order to support CORS requests with older browsers (see code example bellow).
-
-When Event Source is enabled, a new `/subscribe` API endpoint is available. Use the `events` query-string parameter with a list of events separated by spaces:
-
-    > GET /subscribe?events=event1+event2+event3 HTTP/1.1
-    > Accept: text/event-stream
-    >
-    ---
-    < HTTP/1.1 200 OK
-    < Content-Type: text/event-stream
-    < Cache-Control: no-cache
-    < Access-Control-Allow-Origin: *
-    < Connection: close
-    <
-    ... some time passes ...
-    < data: {"event": "event1", "title": {"default": "Title", "fr": "Titre"}, "message": {...}, "data": {"var1": "val1", "var2": "val2"}}
-    ... some time passes ...
-    < data: {"event": "event2", "title": {"default": "Title", "fr": "Titre"}, "message": {...}, "data": {"var1": "val1", "var2": "val2"}}
-
-Or in Javascript:
-
-``` html
-<script src="https://raw.github.com/Yaffle/EventSource/master/eventsource.js"></script>
-<script>
-var es = new EventSource('http://localhost/subscribe?events=event1+event2+event3');
-es.addEventListener('message', function (e)
-{
-    var event = JSON.parse(e.data);
-    document.body.appendChild(document.createTextNode(event.message.default));
-    document.body.appendChild(document.createElement('br'));
-});
-</script>
-```
-
-See codepen example: http://codepen.io/rs/pen/xAjpy
-
 API
 ---
 
@@ -175,7 +130,7 @@ API
 
 #### Register a subscriber ID
 
-Register a subscriber by POSTing on `/subscribers` with some subscriber information like registration id, protocol, language, OS version (useful for Windows Phone OS) or initial badge number (only relevant for iOS, see bellow).
+Register a subscriber by POSTing on `/subscribers` with some subscriber information like registration id, protocol, language, or initial badge number (only relevant for iOS, see below).
 
     > POST /subscribers HTTP/1.1
     > Content-Type: application/x-www-form-urlencoded
@@ -205,8 +160,7 @@ Register a subscriber by POSTing on `/subscribers` with some subscriber informat
 
 - `proto`: The protocol to be used for the subscriber. Use one of the following values:
 	- `apns`: iOS (Apple Push Notification service)
-	- `gcm` or `c2dm`: Android (Cloud to subscriber Messaging)
-	- `mpns` Window Phone (Microsoft Push Notification Service)
+	- `gcm`: Android (Firebase Cloud Messaging)
 - `token`: The device registration id delivered by the platform's push notification service
 
 ##### Allowed parameters:
@@ -214,8 +168,6 @@ Register a subscriber by POSTing on `/subscribers` with some subscriber informat
 - `lang`: The language code for the of the subscriber. This parameter is used to determine which message translation to use when pushing text notifications. You may use the 2 chars ISO code or a complete locale code (i.e.: en_CA) or any value you want as long as you provide the same values in your events. See below for info about events formatting.
 - `badge`: The current app badge value. This parameter is only applicable to iOS for which badge counters must be maintained server side. On iOS, when a user read or loads more unread items, you must inform the server of the badge's new value. This badge value will be incremented automatically by pushd each time a new notification is sent to the subscriber.
 - `category`: The category for the push notification action. This parameter is only applicable to iOS8. 
-- `contentAvailable`: The 'content-available' flag value. This parameter is only applicable to iOS7 and applications which support Silent Remote Notifications or Newsstand capability. With iOS7 it is possible to have the application wake up before the user opens the app.
-- `version`: This is the OS subscriber version. This parameter is only needed by Windows Phone OS. By setting this value to 7.5 or greater an `mpns` subscriber ids will enable new MPNS push features.
 
 ##### Return Codes
 
@@ -239,7 +191,6 @@ On each app launch, it is highly recommended to update your subscriber informati
 
 - `lang`: The language code for the of the subscriber. This parameter is used to determine which message translation to use when pushing text notifications. You may use the 2 chars ISO code or a complete locale code (i.e.: en_CA) or any value you want as long as you provide the same values in your events. See below for info about events formatting.
 - `badge`: The current app badge value. This parameter is only applicable to iOS for which badge counters must be maintained server side. On iOS, when a user read or loads more unread items, you must inform the server of the badge's new value. This badge value will be incremented automatically by pushd each time a new notification is sent to the subscriber.
-- `version`: This is the OS subscriber version. This parameter is only needed by Windows Phone OS. By setting this value to 7.5 or greater an `mpns` subscriber ids will enable new MPNS push features.
 
 NOTE: this method should be called each time the app is opened to inform pushd the subscriber is still alive. If you don’t, the subscriber may be automatically unregistered in case of repeated push error.
 
@@ -403,7 +354,7 @@ The event name is commonly used to send notifications for registered subscriptio
 
 An event message is a dictionary of optional key/values:
 
-- `title`, `msg`: The event title/message. If no title nor message are provided, the event will only send data to the app and won't notify the user. The `title` is only relevant for Android and Windows Phone, iOS doesn't support this value: the application name is always used as notification title. *The value can contain placeholders to other keys, see Message Template bellow.*
+- `title`, `msg`: The event title/message. If no title nor message are provided, the event will only send data to the app and won't notify the user. The `title` is only relevant for Android, iOS doesn't support this value: the application name is always used as notification title. *The value can contain placeholders to other keys, see Message Template bellow.*
 - `title.<lang>`, `msg.<lang>`: The translated version of the event title/message. The `<lang>` part must match the `lang` property of a target subscriber. If subscribers use full locale (i.e. `fr_CA`), and no matching locale value is provided, pushd will fallback to a language only version of the value if any (i.e. `fr`). If no translation matches, the `title` or `msg` key is used. *The value can contain placeholders to other keys, see Message Template bellow.*
 - `data.<key>`: Key/values to be attached to the notification
 - `var.<key>`: Stores strings to be reused in `msg` and `<lang>.msg` contents
