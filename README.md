@@ -503,7 +503,7 @@ Testing
 
 ### Performance testing
 
-See [tests/performance/README.md](tests/performance/README.md).
+See [test/performance/README.md](test/performance/README.md).
 
 License
 -------
