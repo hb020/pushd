@@ -8,8 +8,8 @@ import base64
 import random
 from multiprocessing import Process
 
-PUSHD_SERVER = 'http://admin:admin@localhost:5000'
-PUSHD_SERVER_WITHOUT_AUTH = 'http://localhost:5000'
+PUSHD_SERVER = 'http://localhost:8090'
+PUSHD_SERVER_WITHOUT_AUTH = 'http://localhost:8090'
 PUSHD_AUTHORIZATION = 'Basic %s' % base64.encodestring('admin:admin')
 TOKEN_HTTP = 'http://localhost:5001/log'
 
@@ -85,7 +85,7 @@ def generateRandomHTTPSubscribers(event, count):
     subscribers = []
     print 'Creating %d subscribers for %s' % (count, event)
     for i in xrange(count):
-        subscriber = Subscriber(randomHTTPToken(), 'http')
+        subscriber = Subscriber(randomHTTPToken(), 'gcm')
         subscriber.subscribe(event)
         subscribers.append(subscriber)
     return subscribers
@@ -107,29 +107,29 @@ def startPushProcesses(targets):
 
 def settings():
     # events and notification frequencies
-    push_targets = [RepeatingMessage('performancetest1', 2),
-                   RepeatingMessage('performancetest2', 10)]
+    push_targets = [RepeatingMessage('performancetest1', 1000),
+                   RepeatingMessage('performancetest2', 1000)]
     subscribers = [generateRandomHTTPSubscribers(push_targets[0].event, 10),
                   generateRandomHTTPSubscribers(push_targets[1].event, 5)]
     return push_targets, subscribers
 
 def main():
     push_targets, subscribers = settings()
-    
+
     processes = startPushProcesses(push_targets)
 
     try:
         while True:
             time.sleep(100)
     except KeyboardInterrupt:
-        print 'Quiting...'
+        print 'Quitting...'
 
     for p in processes:
         p.terminate()
         p.join()
 
     print 'All processes joined'
-        
+
     for subscribersForMessage in subscribers:
         for subscriber in subscribersForMessage:
             subscriber.unregister()

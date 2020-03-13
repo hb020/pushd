@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
 class TimeStatistics {
     constructor() {
@@ -24,11 +25,12 @@ class TimeStatistics {
 const timesPerEvent = {};
 
 const app = express();
-app.use(express.bodyParser());
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
+app.use(bodyParser.json({ limit: '1mb' }));
 
 app.post(/^\/log\/(\w+)$/, function(req, res) {
-    //console.log 'Received message'
-    //console.log req.body
+    // console.log('Received message');
+    // console.log(req.body);
 
     const receivedTime = Date.now()/1000.0;
 
@@ -43,9 +45,7 @@ app.post(/^\/log\/(\w+)$/, function(req, res) {
         res.send(400);
     }
 
-    const {
-        event
-    } = req.body;
+    const { event } = req.body;
 
     const sentTime = body.timestamp;
     const diff = (receivedTime-sentTime)*1000;
