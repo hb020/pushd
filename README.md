@@ -36,7 +36,7 @@ Installation
 - Install dependancies: `npm install`
 - Configure the server: `cp settings-sample.js settings.js && vi settings.js`
 - Start redis: `redis-server`
-- Start the server: `sudo pushd.js`
+- Start the server: `npm start`
 
 Glossary
 --------
