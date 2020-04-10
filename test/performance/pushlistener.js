@@ -36,13 +36,13 @@ app.post(/^\/log\/(\w+)$/, function(req, res) {
 
     if (((req.body.message != null ? req.body.message.default : undefined) == null)) {
         console.log('No default message!');
-        res.send(400);
+        res.sendStatus(400);
     }
 
     const body = JSON.parse(req.body.message.default);
     if (((body != null ? body.timestamp : undefined) == null)) {
         console.log('No timestamp in the body!');
-        res.send(400);
+        res.sendStatus(400);
     }
 
     const { event } = req.body;
@@ -56,7 +56,7 @@ app.post(/^\/log\/(\w+)$/, function(req, res) {
 
     console.log(`${event} ` + timesPerEvent[event].toString());
 
-    return res.send(200);
+    return res.sendStatus(200);
 });
 
 const port = 5001;
