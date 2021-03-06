@@ -46,7 +46,7 @@ Glossary
 - `Event`: A string with associated metadata representing an action performed on the `Application Data Provider`. Events are emitted by the `Application Data Provider` (i.e.: a web site or your application's server-side backend), and `Subscribers` can subscribe to them in order to be notified by the `Protocol` of their choice.
 - `Protocol`: A communication standard to send notification back to the `Subscriber`. Protocols
  are pluggable in pushd so you can add your own custom protocol. By default, pushd is bundled
-  with support for APNs (iOS) and FCM/GCM (Android).
+  with support for APNs over HTTP/2 (iOS) and FCM/GCM (Android).
 
 Getting Started
 ---------------

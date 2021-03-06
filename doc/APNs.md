@@ -2,26 +2,23 @@
 
 A 64 long hexadecimal number.
 
-### Sample Configuration
+### Sample Configurations
+
+With Certificate authentication:
 
 ``` javascript
-exports.apns =
-    enabled: yes
-    class: require('./lib/pushservices/apns').PushServiceAPNS
-    # Convert cert.cer and key.p12 using:
-    # $ openssl x509 -in cert.cer -inform DER -outform PEM -out apns-cert.pem
-    # $ openssl pkcs12 -in key.p12 -out apns-key.pem -nodes
-    cert: 'apns-cert.pem'
-    key: 'apns-key.pem'
-    cacheLength: 100
-    # uncommant for dev env
-    #gateway: 'gateway.sandbox.push.apple.com'
-    #address: 'feedback.sandbox.push.apple.com'
+exports.apns = {
+    enabled: yes,
+    class: require('./lib/pushservices/apns').PushServiceAPNS,
+
+    cert: 'path/to/apns-cert.pem',
+    key: 'path/to/apns-key.pem',
+    production: false, // set to true for production
+    topic : 'your-app-bundle-id' // if set, this is sent in the notification.
+}
 ```
 
-Parameters are transmitted as-is to the [apn node module](https://github.com/argon/node-apn).
-
-### Converting your APNs Certificate
+Converting your APNs Certificate:
 
 After requesting the certificate from Apple, export your private key as a .p12 file and download the .cer file from the iOS Provisioning Portal.
 
@@ -31,3 +28,24 @@ Now, in the directory containing cert.cer and key.p12 execute the following comm
     $ openssl pkcs12 -in key.p12 -out key.pem -nodes
 
 If you are using a development certificate you may wish to name them differently to enable fast switching between development and production. The filenames are configurable within the module options, so feel free to name them something more appropriate.
+
+
+With Token authentication (less maintenance):
+
+``` javascript
+exports.apns = {
+    enabled: yes,
+    class: require('./lib/pushservices/apns').PushServiceAPNS,
+
+    token: {
+        key: "path/to/APNsAuthKey_XXXXXXXXXX.p8", // XXXXXXXXXX is likely your key-id
+        keyId: "key-id",
+        teamId: "developer-team-id"
+    },
+    production: false, // set to true for production
+    topic : 'your-app-bundle-id' // if set, this is sent in the notification.
+}
+```
+
+Parameters are transmitted as-is to the [apn node module](https://github.com/argon/node-apn).
+

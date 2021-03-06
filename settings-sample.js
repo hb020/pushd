@@ -26,12 +26,21 @@ exports.server = {
 exports.apns = {
     enabled: true,
     class: require('./lib/pushservices/apns').PushServiceAPNS,
+    // When using certificate based authentication:
     // Convert cert.cer and key.p12 using:
     // $ openssl x509 -in cert.cer -inform DER -outform PEM -out apns-cert.pem
     // $ openssl pkcs12 -in key.p12 -out apns-key.pem -nodes
-    cert: 'apns-cert.pem',
-    key: 'apns-key.pem',
-    cacheLength: 100,
+    // cert: 'path/to/apns-cert.pem',
+    // key: 'path/to/apns-key.pem',
+    
+    // When using token-based authentication (a key) (which is less maintenance than certificates):
+    token: {
+        key: "path/to/APNsAuthKey_XXXXXXXXXX.p8", // XXXXXXXXXX is likely your key-id
+        keyId: "key-id",
+        teamId: "developer-team-id"
+    },
+    production: false, // set to true for production
+    topic : 'your-app-bundle-id', // if set, this is sent in the notification.
     // Uncomment to set the default value for parameter.
     // This setting not overrides the value for the parameter that is set in the payload fot event request.
     // category: 'show'
@@ -39,22 +48,6 @@ exports.apns = {
     // Keep in mind that APNS limits notification payload size to 256 bytes
     payloadFilter: ['messageFrom']
 };
-    // uncommant for dev env
-    //gateway: 'gateway.sandbox.push.apple.com'
-    //address: 'feedback.sandbox.push.apple.com'
-
-// # Uncomment to use same host for prod and dev
-// exports['apns-dev'] =
-//     enabled: yes
-//     class: require('./lib/pushservices/apns').PushServiceAPNS
-//     # Your dev certificats
-//     cert: 'apns-cert.pem'
-//     key: 'apns-key.pem'
-//     cacheLength: 100
-//     gateway: 'gateway.sandbox.push.apple.com'
-//	  # Uncomment to set the default value for parameter.
-//     # This setting not overrides the value for the parameter that is set in the payload fot event request.
-//     # category: 'show'
 
 exports.gcm = {
     enabled: true,

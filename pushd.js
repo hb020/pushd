@@ -143,7 +143,9 @@ const authorize = function(realm) {
         return function(req, res, next) {
             let remoteAddr;
             if (remoteAddr = req.socket && (req.socket.remoteAddress || (req.socket.socket && req.socket.socket.remoteAddress))) {
-                for (network of Array.from(networks)) {
+                remoteAddr = remoteAddr.replace(/^.*:/, ''); // poor man's forcing it ipv4 in case
+                //logger.silly(`Got connection from ${remoteAddr}`); 
+            	for (network of Array.from(networks)) {
                     if (network.contains(remoteAddr)) {
                         next();
                         return;
