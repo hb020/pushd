@@ -4,7 +4,7 @@ A 64 long hexadecimal number.
 
 ### Sample Configuration
 
-``` coffeescript
+``` javascript
 exports.apns =
     enabled: yes
     class: require('./lib/pushservices/apns').PushServiceAPNS
