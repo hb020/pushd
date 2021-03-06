@@ -8,7 +8,7 @@ Universal Mobile Push Daemon
 Features
 --------
 
-- Supports [APNs] \(iOS) and FCM/[GCM] \(Android)
+- Supports [APNs](with HTTP/2) \(iOS) and FCM/[GCM] \(Android)
 - Pluggable protocols
 - Register unlimited number of subscribers (device)
 - Subscribe to unlimited number of events
@@ -21,7 +21,6 @@ Features
 - GCM multicast messaging
 - Events statistics
 - Automatic failing subscriber unregistration
-- Built-in Apple Feedback API handling
 - Redis backend
 - Fracking fast!
 

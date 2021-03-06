@@ -4,7 +4,9 @@ A 64 long hexadecimal number.
 
 ### Sample Configurations
 
-With Certificate authentication:
+You have the choice between Certificate authentication or Token authentication. The latter is less maintenance, because it doesn't expire.
+
+#### With Certificate authentication:
 
 ``` javascript
 exports.apns = {
@@ -30,7 +32,7 @@ Now, in the directory containing cert.cer and key.p12 execute the following comm
 If you are using a development certificate you may wish to name them differently to enable fast switching between development and production. The filenames are configurable within the module options, so feel free to name them something more appropriate.
 
 
-With Token authentication (less maintenance):
+#### With Token authentication:
 
 ``` javascript
 exports.apns = {
