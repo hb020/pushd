@@ -54,6 +54,15 @@ exports.gcm = {
     class: require('./lib/pushservices/gcm').PushServiceGCM,
     key: 'GCM API KEY HERE'
 };
+
+exports.http = {
+    enabled: true,
+    class: require('./lib/pushservices/http').PushServiceHTTP
+}
+
+exports['event-source'] = {
+    enabled: true
+}
     //options:
        //proxy: 'PROXY SERVER HERE'
 
