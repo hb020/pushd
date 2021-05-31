@@ -52,12 +52,17 @@ const createSubscriber = function(fields, cb) {
 
 const tokenResolver = (proto, token, cb) => Subscriber.prototype.getInstanceFromToken(redis, proto, token, cb);
 
+var eventSourceEnabled = false
 var pushServices = new PushServices();
 for (let name in settings) {
     const conf = settings[name];
     if (conf.enabled) {
         logger.info(`Registering push service: ${name}`);
-        pushServices.addService(name, new conf.class(conf, logger, tokenResolver));
+		if (name == 'event-source') {
+			eventSourceEnabled = true;
+		} else {
+			pushServices.addService(name, new conf.class(conf, logger, tokenResolver));
+		}
     }
 }
 const eventPublisher = new EventPublisher(pushServices);
@@ -160,6 +165,8 @@ const authorize = function(realm) {
 };
 
 require('./lib/api').setupRestApi(app, createSubscriber, getEventFromId, authorize, testSubscriber, eventPublisher, checkStatus);
+if (eventSourceEnabled)
+    require('./lib/eventsource').setup(app, authorize, eventPublisher)
 
 let port = __guard__(settings != null ? settings.server : undefined, x => x.tcp_port) != null ? __guard__(settings != null ? settings.server : undefined, x => x.tcp_port) : 80;
 const listen_ip = __guard__(settings != null ? settings.server : undefined, x1 => x1.listen_ip);
